@@ -7,6 +7,9 @@ public class TargetScript : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        Destroy(gameObject);
+        if (!collision.gameObject.CompareTag("Platform"))
+        {
+            Destroy(gameObject);
+        }
     }
 }

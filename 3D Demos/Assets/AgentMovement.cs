@@ -21,7 +21,8 @@ public class AgentMovement : MonoBehaviour
     float initialVelocityZ;
 
     [HideInInspector]
-    public float slowingRadius = 5f; 
+    public float slowingRadius = 20f;
+    [HideInInspector]
     public bool slow = false;
 
     private bool completed = false;
@@ -76,12 +77,13 @@ public class AgentMovement : MonoBehaviour
 
     private void Seek()
     {
-        float distance = Vector3.Distance(player.position, transform.position);
-
         // calculate the direction towards the player
         // velocity = normalize(target - position) * max_velocity
         Vector3 direction = (player.position - transform.position).normalized;
         direction.y = 0;
+
+        // Use Arrive method to update the agent's position
+        Arrive(player.position);
 
         Vector3 desiredVelocity = direction * maxVelocity;
 
@@ -98,19 +100,6 @@ public class AgentMovement : MonoBehaviour
 
         Vector3 newVelocity = rb.velocity + steering;
 
-        if (distance < slowingRadius)
-        {
-            desiredVelocity = desiredVelocity.normalized * maxVelocity * (distance / slowingRadius);
-        }
-
-        else
-        {
-            desiredVelocity = desiredVelocity.normalized * maxVelocity;
-            steering = (desiredVelocity - rb.velocity) * steeringForce;
-            steering = Truncate(steering, maxForce);
-            steering = steering / rb.mass;
-        }
-
         // truncate the new velocity to ensure it doesn't exceed maxVelocity (normalize) 
         newVelocity = Truncate(newVelocity, maxVelocity);
 
@@ -122,8 +111,9 @@ public class AgentMovement : MonoBehaviour
         //transform.LookAt(newPosition); 
 
         Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);    
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
+
 
     private void Flee()
     {
@@ -153,10 +143,36 @@ public class AgentMovement : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
-    private void Arrive(Vector3 velocity)
+    private void Arrive(Vector3 targetPosition)
     {
-        
+        Vector3 desiredVelocity = targetPosition - transform.position;
+        float distance = Vector3.Distance(targetPosition, transform.position);
+
+        if (distance < slowingRadius)
+        {
+            desiredVelocity = desiredVelocity.normalized * maxVelocity * (distance / slowingRadius);
+        }
+        else
+        {
+            desiredVelocity = desiredVelocity.normalized * maxVelocity;
+        }
+
+        Vector3 steering = desiredVelocity - rb.velocity;
+
+        steering = Truncate(steering, maxForce);
+        steering /= rb.mass;
+        Vector3 newVelocity = rb.velocity + steering;
+
+        newVelocity = Truncate(newVelocity, maxVelocity);
+
+        Vector3 newPosition = transform.position + newVelocity * Time.fixedDeltaTime;
+        rb.MovePosition(newPosition);
+
+        // Rotate the agent to look at the target position
+        Quaternion targetRotation = Quaternion.LookRotation(new Vector3(desiredVelocity.x, 0, desiredVelocity.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
+
 
     private Vector3 Truncate(Vector3 vector, float maxLength)
     {
@@ -166,13 +182,4 @@ public class AgentMovement : MonoBehaviour
         }
         return vector;
     }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            rb.velocity = Vector3.zero;
-            completed = true; 
-        }
-    } 
 }

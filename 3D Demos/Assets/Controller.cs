@@ -5,7 +5,6 @@ public class Controller : MonoBehaviour
 {
     public float moveSpeed = 6f;
     public float targetRadius = 5f;
-    
 
     Rigidbody rb;
     Camera viewCamera;

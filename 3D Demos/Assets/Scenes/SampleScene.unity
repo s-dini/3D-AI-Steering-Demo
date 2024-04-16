@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 130795831}
   m_Layer: 0
   m_Name: Platform
-  m_TagString: Untagged
+  m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -296,6 +296,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player Type 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 4978151468361374636, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -402,13 +410,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 315457301}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 596a90ac13a377c4dabeac4d043668d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 14.66
-  viewAngle: 0
+  viewRadius: 35.72
+  viewAngle: 168
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 256
+  visibleTargets: []
 --- !u!114 &315457309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -416,7 +431,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 315457301}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a87830c1ac4336e499403464373b5955, type: 3}
   m_Name: 
@@ -2075,7 +2090,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4978151468361374636, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -2097,6 +2112,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5943010087471773340}
+    - targetCorrespondingSourceObject: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5943010087471773343}
   m_SourcePrefab: {fileID: 100100000, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
 --- !u!54 &5943010087471773338
 Rigidbody:
@@ -2107,7 +2125,7 @@ Rigidbody:
   m_GameObject: {fileID: 158663129882998581}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -2160,7 +2178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
-  player: {fileID: 1243979787}
+  player: {fileID: 315457302}
   canSeek: 1
   canFlee: 0
   maxVelocity: 5
@@ -2169,3 +2187,24 @@ MonoBehaviour:
   maxForce: 50
   slowingRadius: 5
   slow: 0
+--- !u!114 &5943010087471773343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158663129882998581}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 596a90ac13a377c4dabeac4d043668d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewRadius: 20
+  viewAngle: 124
+  targetMask:
+    serializedVersion: 2
+    m_Bits: 0
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 0
+  visibleTargets: []
