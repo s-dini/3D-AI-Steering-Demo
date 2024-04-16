@@ -356,6 +356,7 @@
 "Assets/AgentMovement.cs"
 "Assets/Controller.cs"
 "Assets/FieldOfView.cs"
+"Assets/FieldOfViewEditor.cs"
 "Assets/PlayerA_Movement.cs"
 "Assets/TargetScript.cs"
 -langversion:9.0

@@ -4,6 +4,8 @@ using System.Collections;
 public class Controller : MonoBehaviour
 {
     public float moveSpeed = 6f;
+    public float targetRadius = 5f;
+    
 
     Rigidbody rb;
     Camera viewCamera;
@@ -21,6 +23,17 @@ public class Controller : MonoBehaviour
         
         transform.LookAt(mousePos + Vector3.up * transform.position.y);
         velocity = new Vector3(mousePos.x, 0, mousePos.z).normalized * moveSpeed;
+
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, targetRadius); 
+
+        /*foreach (var collider in hitColliders)
+        {
+            if (collider.gameObject.CompareTag("Agent"))
+            {
+                AgentMovement agent = collider.gameObject.GetComponent<AgentMovement>();
+                agent.slow = true; 
+            }
+        }*/
     }
 
     void FixedUpdate()

@@ -254,7 +254,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -30.5
+      value: -31.5
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -262,7 +262,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14
+      value: 14.3
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -366,7 +366,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -407,7 +407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 596a90ac13a377c4dabeac4d043668d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 0
+  viewRadius: 14.66
   viewAngle: 0
 --- !u!114 &315457309
 MonoBehaviour:
@@ -422,6 +422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
+  targetRadius: 5
 --- !u!1 &359029627
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,7 +1003,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750829315}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -23.63839, y: 4.103889, z: -20.098225}
+  m_LocalPosition: {x: 0.4, y: 4.3, z: -51.4}
   m_LocalScale: {x: 6.7718, y: 0.6359896, z: 6.7718}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2079,7 +2080,7 @@ PrefabInstance:
     - target: {fileID: 4978151468361374636, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 110376de66236674ba1448292d29a90b, type: 2}
+      objectReference: {fileID: 2100000, guid: 9cda16dbc43813840a72b54b0ae5c757, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -2160,9 +2161,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
   player: {fileID: 1243979787}
-  canSeek: 0
-  canFlee: 1
+  canSeek: 1
+  canFlee: 0
   maxVelocity: 5
   radius: 50
   steeringForce: 5
   maxForce: 50
+  slowingRadius: 5
+  slow: 0

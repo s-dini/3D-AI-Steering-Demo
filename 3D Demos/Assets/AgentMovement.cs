@@ -12,22 +12,24 @@ public class AgentMovement : MonoBehaviour
     public bool canFlee; 
 
     public float maxVelocity = 20f;
-    public float radius;
+    public float radius = 20f;
 
     public float steeringForce = 2f;
     public float maxForce = 50f;
 
     float initialVelocityX;
-    float initialVelocityZ; 
+    float initialVelocityZ;
 
+    [HideInInspector]
+    public float slowingRadius = 5f; 
+    public bool slow = false;
 
+    private bool completed = false;
     private Rigidbody rb;
 
     void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody>();
-
-
     }   
     
     void Start()
@@ -43,6 +45,14 @@ public class AgentMovement : MonoBehaviour
     {
         rb.velocity = new Vector3(initialVelocityX, 0f, initialVelocityZ);
 
+        if (!completed)
+        {
+            Steering(); 
+        }
+    }
+
+    private void Steering()
+    {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
 
         foreach (var hitCollider in hitColliders)
@@ -58,18 +68,21 @@ public class AgentMovement : MonoBehaviour
                 {
                     Flee();
                 }
+
+                // Controller player = hitCollider.gameObject.GetComponent<Controller>();
             }
         }
     }
 
     private void Seek()
     {
+        float distance = Vector3.Distance(player.position, transform.position);
+
         // calculate the direction towards the player
         // velocity = normalize(target - position) * max_velocity
         Vector3 direction = (player.position - transform.position).normalized;
         direction.y = 0;
 
-        // desired_velocity = normalize(target - position) * max_velocity
         Vector3 desiredVelocity = direction * maxVelocity;
 
         /* 
@@ -85,6 +98,19 @@ public class AgentMovement : MonoBehaviour
 
         Vector3 newVelocity = rb.velocity + steering;
 
+        if (distance < slowingRadius)
+        {
+            desiredVelocity = desiredVelocity.normalized * maxVelocity * (distance / slowingRadius);
+        }
+
+        else
+        {
+            desiredVelocity = desiredVelocity.normalized * maxVelocity;
+            steering = (desiredVelocity - rb.velocity) * steeringForce;
+            steering = Truncate(steering, maxForce);
+            steering = steering / rb.mass;
+        }
+
         // truncate the new velocity to ensure it doesn't exceed maxVelocity (normalize) 
         newVelocity = Truncate(newVelocity, maxVelocity);
 
@@ -96,7 +122,7 @@ public class AgentMovement : MonoBehaviour
         //transform.LookAt(newPosition); 
 
         Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);    
     }
 
     private void Flee()
@@ -127,6 +153,11 @@ public class AgentMovement : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
+    private void Arrive(Vector3 velocity)
+    {
+        
+    }
+
     private Vector3 Truncate(Vector3 vector, float maxLength)
     {
         if (vector.magnitude > maxLength)
@@ -136,4 +167,12 @@ public class AgentMovement : MonoBehaviour
         return vector;
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            rb.velocity = Vector3.zero;
+            completed = true; 
+        }
+    } 
 }
