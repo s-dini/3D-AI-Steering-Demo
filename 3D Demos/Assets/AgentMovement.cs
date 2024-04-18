@@ -2,11 +2,13 @@ using System;
 using System.IO;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class AgentMovement : MonoBehaviour
 {
     public Camera mainCamera;
-    public Transform player;
+
+    public string targetTag; 
 
     public bool canSeek;
     public bool canFlee; 
@@ -17,16 +19,20 @@ public class AgentMovement : MonoBehaviour
     public float steeringForce = 2f;
     public float maxForce = 50f;
 
+    public float displacementRadius = 3f; 
+
     float initialVelocityX;
     float initialVelocityZ;
 
     [HideInInspector]
-    public float slowingRadius = 20f;
+    public float slowingRadius = 10f;
     [HideInInspector]
     public bool slow = false;
+    [HideInInspector]
+    public Rigidbody rb;
+
 
     private bool completed = false;
-    private Rigidbody rb;
 
     void Awake()
     {
@@ -39,35 +45,25 @@ public class AgentMovement : MonoBehaviour
         //  initialVelocityZ = UnityEngine.Random.Range(-maxVelocity, maxVelocity);
 
         initialVelocityX = 1f;
-        initialVelocityZ = 5f; 
+        initialVelocityZ = 5f;
     }
 
-    void FixedUpdate()
-    {
-        rb.velocity = new Vector3(initialVelocityX, 0f, initialVelocityZ);
-
-        if (!completed)
-        {
-            Steering(); 
-        }
-    }
-
-    private void Steering()
+    public void Steering()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius);
 
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.gameObject.tag == "Player")
+            if (hitCollider.gameObject.tag == targetTag )
             {
                 if (canSeek)
                 {
-                    Seek();
+                    Seek( hitCollider.gameObject.transform );
                 }
 
                 else if (canFlee)
                 {
-                    Flee();
+                    Flee( hitCollider.gameObject.transform );
                 }
 
                 // Controller player = hitCollider.gameObject.GetComponent<Controller>();
@@ -75,15 +71,14 @@ public class AgentMovement : MonoBehaviour
         }
     }
 
-    private void Seek()
+    public void Seek( Transform target)
     {
-        // calculate the direction towards the player
+        // calculate the direction towards the target
         // velocity = normalize(target - position) * max_velocity
-        Vector3 direction = (player.position - transform.position).normalized;
+        Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0;
 
-        // Use Arrive method to update the agent's position
-        Arrive(player.position);
+        Arrive(target.position);
 
         Vector3 desiredVelocity = direction * maxVelocity;
 
@@ -107,17 +102,16 @@ public class AgentMovement : MonoBehaviour
         Vector3 newPosition = transform.position + newVelocity * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
 
-        // rotate the "head" of the agent to look at the player
+        // rotate the "head" of the agent to look at the target
         //transform.LookAt(newPosition); 
 
-        Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
+        // Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+        // transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
-
-    private void Flee()
+    public void Flee( Transform target )
     {
-        Vector3 direction = (transform.position - player.position).normalized;
+        Vector3 direction = (transform.position - target.position).normalized;
         direction.y = 0;
 
         // desired_velocity = normalize(target - position) * max_velocity
@@ -136,14 +130,14 @@ public class AgentMovement : MonoBehaviour
         Vector3 newPosition = transform.position + newVelocity * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
 
-        // rotate the "head" of the agent to look at the player
+        // rotate the "head" of the agent to look at the target 
         //transform.LookAt(newPosition); 
 
         Quaternion targetRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
-    private void Arrive(Vector3 targetPosition)
+    public void Arrive(Vector3 targetPosition)
     {
         Vector3 desiredVelocity = targetPosition - transform.position;
         float distance = Vector3.Distance(targetPosition, transform.position);
@@ -168,13 +162,44 @@ public class AgentMovement : MonoBehaviour
         Vector3 newPosition = transform.position + newVelocity * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
 
-        // Rotate the agent to look at the target position
+        // rotate the agent to look at the target position
         Quaternion targetRotation = Quaternion.LookRotation(new Vector3(desiredVelocity.x, 0, desiredVelocity.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
+    public Vector3 Wander()
+    {
+        Vector3 circleCenter = rb.velocity.normalized * displacementRadius;
+        Vector3 displacement = new Vector3(UnityEngine.Random.Range(0f, 1f), 0, UnityEngine.Random.Range(0f, 1f));
+        Vector3 wanderForce = circleCenter + displacement;
 
-    private Vector3 Truncate(Vector3 vector, float maxLength)
+        float angle = Vector3.Angle(rb.velocity, wanderForce);
+        
+        float newVectorX = Mathf.Cos(UnityEngine.Random.Range(0, angle));
+        float newVectorY = Mathf.Sin(UnityEngine.Random.Range(0, angle));
+
+        float randVectorX = UnityEngine.Random.Range(0f, 1f) * newVectorX - (newVectorX * 0.5f);
+        float randVectorY = UnityEngine.Random.Range(0f, 1f) * newVectorY - (newVectorY * 0.5f);
+
+        wanderForce = new Vector3(randVectorX, 0, randVectorY);
+
+        return wanderForce; 
+
+        /*float randomAngle = (UnityEngine.Random.Range(0, angle));
+        
+        Vector3 result = randomAngle * rb.velocity;
+
+        float usedAngle = UnityEngine.Random.Range(0f, 1f) * angle - (angle * 0.5f); Debug.Log(usedAngle);
+        
+        // wanderAngle += (Math.random() * ANGLE_CHANGE) - (ANGLE_CHANGE * .5);
+        Quaternion randomDir = Quaternion.AngleAxis(UnityEngine.Random.Range(0f, 1f) * angle - (angle * 0.5f), Vector3.up);
+
+        Vector3 randomDire = new Vector3(Mathf.Sin(usedAngle), 0, Mathf.Cos(usedAngle));*/ 
+
+
+    }
+
+    public Vector3 Truncate(Vector3 vector, float maxLength)
     {
         if (vector.magnitude > maxLength)
         {

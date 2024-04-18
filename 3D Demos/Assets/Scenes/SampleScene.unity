@@ -301,6 +301,10 @@ PrefabInstance:
       value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4713514679455744469, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -423,7 +427,10 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 256
+  agent: {fileID: 0}
   visibleTargets: []
+  wanderingForce: {x: 0, y: 0, z: 0}
+  rb: {fileID: 0}
 --- !u!114 &315457309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1578,7 +1585,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1378834512
 Transform:
   m_ObjectHideFlags: 0
@@ -1587,8 +1594,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1378834511}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.7959077, z: 3.4515376}
-  m_LocalScale: {x: 0.044689216, y: 0.060904004, z: 5.2543125}
+  m_LocalPosition: {x: 0, y: -0.03, z: 3.4515376}
+  m_LocalScale: {x: 0.044689216, y: 0.014120593, z: 5.2543125}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 510300630813838616}
@@ -2054,7 +2061,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -36.153
+      value: -37
       objectReference: {fileID: 0}
     - target: {fileID: 1628817809148690362, guid: 1d15a5f60c47de246991b5f0d0f528f7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2178,15 +2185,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
-  player: {fileID: 315457302}
+  targetTag: 
   canSeek: 1
   canFlee: 0
   maxVelocity: 5
   radius: 50
-  steeringForce: 5
+  steeringForce: 20.18
   maxForce: 50
+  displacementRadius: 20
   slowingRadius: 5
   slow: 0
+  rb: {fileID: 0}
 --- !u!114 &5943010087471773343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2194,7 +2203,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 158663129882998581}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 596a90ac13a377c4dabeac4d043668d0, type: 3}
   m_Name: 
@@ -2206,5 +2215,8 @@ MonoBehaviour:
     m_Bits: 0
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
+  agent: {fileID: 5943010087471773340}
   visibleTargets: []
+  wanderingForce: {x: 0, y: 0, z: 0}
+  rb: {fileID: 0}

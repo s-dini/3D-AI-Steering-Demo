@@ -12,14 +12,27 @@ public class FieldOfView : MonoBehaviour
     public LayerMask targetMask;
     public LayerMask obstacleMask;
 
+    public AgentMovement agent; 
+
     [HideInInspector]
     public List<Transform> visibleTargets = new List<Transform>();
+
+    [HideInInspector]
+    public Vector3 wanderingForce = Vector3.zero;
+
+    [HideInInspector]
+    public Rigidbody rb;
 
     void Start()
     {
         StartCoroutine("FindTargetsWithDelay", .2f);
+        StartCoroutine("Wander", 1f); 
     }
 
+    void Awake()
+    {
+        rb = gameObject.GetComponent<Rigidbody>();
+    }
 
     IEnumerator FindTargetsWithDelay(float delay)
     {
@@ -28,6 +41,25 @@ public class FieldOfView : MonoBehaviour
             yield return new WaitForSeconds(delay);
             FindVisibleTargets();
         }
+    }
+
+    IEnumerator Wander(float delay)
+    {
+        wanderingForce = agent.Wander();
+
+        while (true)
+        {
+            yield return new WaitForSeconds(delay);
+            wanderingForce = agent.Wander(); 
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        rb.velocity = (rb.velocity += wanderingForce).normalized * agent.maxVelocity;
+
+        Quaternion targetRotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
     }
 
     void FindVisibleTargets()
