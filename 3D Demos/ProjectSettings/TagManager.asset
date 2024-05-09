@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Platform
+  - Buff
+  - Target
+  - Leader
+  - Follower
   layers:
   - Default
   - TransparentFX
@@ -16,7 +20,7 @@ TagManager:
   - Targets
   - Obstacles
   - Player
-  - 
+  - Platform
   - 
   - 
   - 

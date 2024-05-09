@@ -8,7 +8,8 @@ public class TargetScript : MonoBehaviour
     {
         if (!collision.gameObject.CompareTag("Platform"))
         {
-            Destroy(gameObject);
+            FindObjectOfType<AudioManager>().Play("Obtained");
+            Destroy(gameObject, 0.1f);
         }
     }
 }

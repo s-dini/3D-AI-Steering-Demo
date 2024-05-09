@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class SteeringManager : MonoBehaviour
+public class Steering : MonoBehaviour
 {
     public float maxVelocity = 20f;
 
@@ -13,8 +13,10 @@ public class SteeringManager : MonoBehaviour
     public float slowingRadius = 10f;
     [HideInInspector]
     public bool slow = false;
-    [HideInInspector]
-    public Rigidbody rb;
+    
+    Rigidbody rb;
+
+    public GameObject player; 
 
 
     void Awake()
@@ -32,13 +34,6 @@ public class SteeringManager : MonoBehaviour
         // Arrive(target);
 
         Vector3 desiredVelocity = direction * maxVelocity;
-
-        /* 
-            * steering = truncate (steering, max_force)
-            * steering = steering / mass
-            * velocity = truncate (velocity + steering , max_speed)
-            * position = position + velocity
-            */
 
         Vector3 steering = (desiredVelocity - rb.velocity) * steeringForce;
         steering = Truncate(steering, maxForce);
@@ -112,17 +107,21 @@ public class SteeringManager : MonoBehaviour
         float newVectorX = Mathf.Cos(UnityEngine.Random.Range(0, angle));
         float newVectorY = Mathf.Sin(UnityEngine.Random.Range(0, angle));
 
-        float randVectorX = UnityEngine.Random.Range(0.1f, 1f) * newVectorX - (newVectorX * 0.5f);
-        float randVectorY = UnityEngine.Random.Range(0.1f, 1f) * newVectorY - (newVectorY * 0.5f);
+        float randVectorX = UnityEngine.Random.Range(0.5f, 1f) * newVectorX - (newVectorX * 0.5f);
+        float randVectorY = UnityEngine.Random.Range(0.5f, 1f) * newVectorY - (newVectorY * 0.5f);
 
         wanderForce = new Vector3(randVectorX, 0, randVectorY);
+        Debug.Log(wanderForce);
+
 
         return wanderForce;
     }
 
     public Vector3 Pursuit(GameObject target)
     {
-        Rigidbody rbt = target.GetComponent<Rigidbody>(); 
+        Rigidbody rbt = target.GetComponent<Rigidbody>();
+
+        T = 2*Vector3.Distance(target.transform.position, gameObject.transform.position) / maxVelocity; 
 
         Vector3 futurePosition = target.transform.position + rbt.velocity * T;
 
@@ -134,18 +133,35 @@ public class SteeringManager : MonoBehaviour
         Vector3 newPosition = transform.position + newVelocity * Time.fixedDeltaTime;
         newPosition.y = 0;
 
-        return Seek(newPosition); 
+        return futurePosition; 
     }
 
     public Vector3 Evade(GameObject target)
     {
         Rigidbody rbt = target.GetComponent<Rigidbody>();
-        
+
+        T = Vector3.Distance(gameObject.transform.position, target.transform.position) / maxVelocity;
+
         Vector3 distance = target.transform.position - transform.position;
         int updatesAhead = Mathf.RoundToInt(distance.magnitude / maxVelocity);
         Vector3 futurePosition = target.transform.position + rbt.velocity * updatesAhead;
-        return Flee(futurePosition);
+        return futurePosition;
     }
+
+    public Vector3 SeeAhead(Vector3 obstacle, float radius)
+    {
+        Vector3 ahead = transform.position + rb.velocity.normalized * radius;
+
+        Vector3 ahead2 = transform.position + rb.velocity.normalized * radius * 0.5f;
+
+        Vector3 avoidanceForce = ahead - obstacle;
+
+        avoidanceForce = avoidanceForce.normalized * radius;
+
+        return avoidanceForce;
+    }
+
+
 
     public Vector3 Truncate(Vector3 vector, float maxLength)
     {
