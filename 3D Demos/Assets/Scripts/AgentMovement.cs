@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class AgentMovement : MonoBehaviour
 {
@@ -56,8 +58,9 @@ public class AgentMovement : MonoBehaviour
     private AgentMovement leaderMovement;
 
     private Vector3 avoidanceForce = Vector3.zero;
+    private int neighborCount = 0; 
 
-    Scene scene; 
+    Scene scene;
 
     enum AlertStage
     {
@@ -94,8 +97,7 @@ public class AgentMovement : MonoBehaviour
     private void Update()
     {
         UpdateBehavior();
-        Debug.Log(alertStage);
-        Debug.Log(alertLevel);
+        ComputeAlignment(); 
 
 
         if (!isMovementPaused)
@@ -146,6 +148,49 @@ public class AgentMovement : MonoBehaviour
         }
     }
 
+    Vector3 ComputeAlignment()
+    {
+        neighborCount = 0; 
+        Vector3 force = Vector3.zero; 
+
+        Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, viewRadius, targetMask);
+        List<Collider> targetsInViewAngle = new List<Collider>(); 
+
+        for (int i = 0; i < targetsInViewRadius.Count(); i++ )
+        {
+            Collider B = targetsInViewRadius[i];
+
+            float signedAngle = Vector3.Angle(transform.forward, B.transform.position - transform.position);
+
+            if (Mathf.Abs(signedAngle) < viewAngle / 2)
+            {
+                targetsInViewAngle.Add(B); 
+            }
+        }
+
+        Debug.Log(neighborCount);
+
+        for (int j = 0; j < targetsInViewAngle.Count(); j++)
+        {
+            Collider B = targetsInViewAngle[j];
+            float DistFromB = Vector3.Distance(transform.position, B.gameObject.transform.position); 
+            
+            if ( DistFromB < 10f )
+            {
+                Rigidbody agentRB = B.GetComponent<AgentMovement>().rb;
+                
+                force.x += agentRB.velocity.x;
+                force.z += agentRB.velocity.z;
+
+                neighborCount++; 
+            }
+        }
+
+        return force; 
+
+    }
+
+
     void FindVisibleTargets()
     {
         visibleTargets.Clear();
@@ -185,7 +230,7 @@ public class AgentMovement : MonoBehaviour
                 {
                     wanderTimer = 0f;
 
-                    steering = Wander(3f);
+                    steering = ComputeAlignment();
                 }
 
                 if (playerInFOV)
@@ -225,27 +270,11 @@ public class AgentMovement : MonoBehaviour
                 else
                 {
                     steering = DetermineBehavior(selectedBehaviorOption, player);
-                    CallFollowers();
                 }
 
                 break;
         }
 
-    }
-
-    public void CallFollowers()
-    {
-        Collider[] Followers = Physics.OverlapSphere(transform.position, viewRadius); 
-
-        foreach (Collider c in Followers)
-        {
-            Debug.Log("Is this function even working?");
-
-            if ( c.gameObject.CompareTag("Follower"))
-            {
-                Debug.Log("Follower Spotted!");
-            }
-        }
     }
 
     public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
@@ -454,7 +483,7 @@ public class AgentMovement : MonoBehaviour
         rb.velocity = new Vector3 (rb.velocity.x, 0, rb.velocity.z);
         gameObject.transform.Rotate(0, transform.rotation.y, 0);
         
-        spotLight.range = viewRadius * 3f;
+        spotLight.range = viewRadius;
 
         if (viewAngle > 179)
         {

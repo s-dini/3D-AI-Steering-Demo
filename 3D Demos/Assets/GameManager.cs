@@ -43,6 +43,12 @@ public class GameManager : MonoBehaviour
         foreach (StageFourController controller in controllers)
         {
             controller.isMovementPaused = isMovementPaused;
-        }; 
+        }
+
+        Controller [] controller2 = FindObjectsOfType<Controller>();
+        foreach (Controller controller in controller2)
+        {
+            controller.isMovementPaused = isMovementPaused;
+        };
     }
 }

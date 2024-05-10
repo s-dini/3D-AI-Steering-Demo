@@ -354,6 +354,7 @@
 -analyzer:"C:/Program Files/Unity 2022.2.19f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity 2022.2.19f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 "Assets/GameManager.cs"
+"Assets/MoveMark.cs"
 "Assets/Scripts/AgentMovement.cs"
 "Assets/Scripts/AudioManager.cs"
 "Assets/Scripts/ClickOut.cs"

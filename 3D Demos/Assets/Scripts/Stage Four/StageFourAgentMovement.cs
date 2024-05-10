@@ -27,6 +27,7 @@ public class StageFourAgentMovement : MonoBehaviour
     [HideInInspector]
     public List<Transform> visibleTargets = new List<Transform>();
 
+
     public List<Transform> pathPoints = new List<Transform>();
 
     [HideInInspector] public string selectedBehaviorOption = "";
@@ -38,7 +39,7 @@ public class StageFourAgentMovement : MonoBehaviour
     Vector3 steering = Vector3.zero;
     float wanderTimer = 0f;
 
-    public GameObject player;
+    private GameObject player;
     GameObject playerTwo;
 
     public float maxVelocity = 20f;
@@ -57,6 +58,8 @@ public class StageFourAgentMovement : MonoBehaviour
     private AgentMovement leaderMovement;
 
     private Vector3 avoidanceForce = Vector3.zero;
+    private Vector3 nextPos = Vector3.zero;
+
     private int location = 0;
     private bool reverseLocation = false; 
 
@@ -82,12 +85,13 @@ public class StageFourAgentMovement : MonoBehaviour
         alertLevel = 0;
 
         rb.velocity = Vector3.zero;
+        nextPos = CalculateNextPosition(pathPoints);
+
     }
 
     private void Update()
     {
         UpdateBehavior();
-        
 
         if (!isMovementPaused)
         {
@@ -117,6 +121,9 @@ public class StageFourAgentMovement : MonoBehaviour
             }
 
             wanderTimer += Time.deltaTime;
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+            steering += Seek(nextPos) * Time.deltaTime;
 
             Vector3 tmp = rb.velocity + steering;
             rb.velocity = (rb.velocity + tmp).normalized * maxVelocity;
@@ -124,8 +131,53 @@ public class StageFourAgentMovement : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(rb.velocity, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5f);
 
-            _UpdateAlertState(playerInFOV);
+            if (Vector3.Distance(transform.position, nextPos) < .5f)
+            {
+                nextPos = CalculateNextPosition(pathPoints);
+                Debug.Log("yeah baby");
+            }
+
+            // _UpdateAlertState(playerInFOV);
         }
+    }
+
+    Vector3 CalculateNextPosition(List<Transform> targetTransforms)
+    {
+        Vector3 pos = Vector3.zero;
+
+        if (!reverseLocation)
+        {
+            if (location == targetTransforms.Count - 1)
+            {
+                reverseLocation = true;
+                pos = targetTransforms[location].position;
+
+            }
+
+            else
+            {
+                pos = targetTransforms[location + 1].position;
+                location++;
+            }
+        }
+
+        if (reverseLocation)
+        {
+            if (location == 0)
+            {
+                reverseLocation = false;
+                pos = targetTransforms[location].position;
+
+            }
+
+            else
+            {
+                pos = targetTransforms[location - 1].position;
+                location--;
+            }
+        }
+
+        return pos;
     }
 
     void FindVisibleTargets()
@@ -153,52 +205,12 @@ public class StageFourAgentMovement : MonoBehaviour
             }
         }
     }
-    Vector3 CalculateNextPosition( List<Transform> targetTransforms)
-    {
-        Vector3 pos = Vector3.zero; 
-
-        if (!reverseLocation)
-        {
-            if (location == targetTransforms.Count - 1)
-            {
-                reverseLocation = true; 
-            }
-
-            else
-            {
-                pos = targetTransforms[location + 1].position;
-                location++; 
-            }
-        }
-
-        if (reverseLocation)
-        {
-            if (location == 0)
-            {
-                reverseLocation = false; 
-            }
-
-            else
-            {
-                pos = targetTransforms[location - 1].position;
-                location--; 
-            }  
-        }
-
-        return pos; 
-    }
 
     private void _UpdateAlertState(bool playerInFOV)
     {
         switch (alertStage)
         {
             case AlertStage.Peaceful:
-
-                if (wanderTimer >= 2f)
-                {
-                    wanderTimer = 0f;
-                    steering = Seek( CalculateNextPosition(pathPoints) );
-                }
 
                 if (playerInFOV)
                 {
