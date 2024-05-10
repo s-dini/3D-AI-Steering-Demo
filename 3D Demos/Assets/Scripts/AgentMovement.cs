@@ -338,8 +338,8 @@ public class AgentMovement : MonoBehaviour
         float newVectorX = Mathf.Cos(UnityEngine.Random.Range(0, angle));
         float newVectorY = Mathf.Sin(UnityEngine.Random.Range(0, angle));
 
-        float randVectorX = UnityEngine.Random.Range(0.5f, 1f) * newVectorX - (newVectorX * 0.5f);
-        float randVectorY = UnityEngine.Random.Range(0.5f, 1f) * newVectorY - (newVectorY * 0.5f);
+        float randVectorX = UnityEngine.Random.Range(0.2f, 1f) * newVectorX - (newVectorX * 0.5f);
+        float randVectorY = UnityEngine.Random.Range(0.2f, 1f) * newVectorY - (newVectorY * 0.5f);
 
         wanderForce = new Vector3(randVectorX, 0, randVectorY);
 

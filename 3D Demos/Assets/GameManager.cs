@@ -39,6 +39,10 @@ public class GameManager : MonoBehaviour
             follower.isMovementPaused = isMovementPaused;
         }
 
-        FindObjectOfType<Controller>().isMovementPaused = isMovementPaused; 
+        StageFourController[] controllers = FindObjectsOfType<StageFourController>();
+        foreach (StageFourController controller in controllers)
+        {
+            controller.isMovementPaused = isMovementPaused;
+        }; 
     }
 }

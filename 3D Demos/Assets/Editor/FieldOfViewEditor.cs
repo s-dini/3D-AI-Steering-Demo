@@ -22,7 +22,7 @@ public class FieldOfViewEditor : Editor
         AgentMovement fow = (AgentMovement)target;
         Handles.color = Color.white;
 
-        Vector3 center = new Vector3(fow.transform.position.x - 0.1f, fow.transform.position.y, fow.transform.position.z + 2.5f);
+        Vector3 center = new Vector3(fow.transform.position.x - 0.1f, fow.transform.position.y, fow.transform.position.z);
 
         Handles.DrawWireArc(center, Vector3.up, Vector3.forward, 360, fow.viewRadius);
         Vector3 viewAngleA = fow.DirFromAngle(-fow.viewAngle / 2, false);
